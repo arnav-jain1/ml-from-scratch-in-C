@@ -315,6 +315,14 @@ Tensor* softmax(Tensor* t1) {
 
 double cross_entropy_loss(Tensor* y_pred, Tensor* y_act) {
     int batch_size = y_pred->shape[0];
+    if (y_act->shape[1] != 1) {
+        fprintf(stderr, "Actual must be of shape (n, 1)");
+        exit(EXIT_FAILURE);
+    }
+    if (batch_size != y_act->total_size) {
+        fprintf(stderr, "Invalid dims for cross entropy loss. Predicted: %d Acutal: %ld \n", batch_size, y_act->total_size);
+        exit(EXIT_FAILURE);
+    }
     int size = y_pred->shape[1];
     double loss = 0.0;
 
