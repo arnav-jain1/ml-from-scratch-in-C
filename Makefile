@@ -1,27 +1,25 @@
-# Compiler
 CC = clang
-
-# Compiler flags
-CFLAGS = -O3 -Wall -g
-
-# Libraries
+CFLAGS = -O3 -Wall -g -I./include
 LIBS = -lm
 
-# Source files
-SRCS = main.c
+SRC_DIR = src
+OBJ_DIR = obj
 
-# Output executable
-TARGET = main
+SRCS = $(wildcard $(SRC_DIR)/*.c)
+OBJS = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRCS))
 
-# Default target
+TARGET = neural_network
+
 all: $(TARGET)
 
-# Build target
-$(TARGET): $(SRCS)
-	$(CC) $(CFLAGS) $(SRCS) -o $(TARGET) $(LIBS)
+$(TARGET): $(OBJS)
+	$(CC) $(CFLAGS) $^ -o $@ $(LIBS)
 
-# Clean up
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	@mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
 clean:
-	rm -f $(TARGET) *.o
+	rm -rf $(OBJ_DIR) $(TARGET)
 
 .PHONY: all clean
