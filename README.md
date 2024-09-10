@@ -5,9 +5,13 @@ Note: This code is highly unoptimized, it will be slower than C but that's okay!
 
 I would also like to try to add some more functions like mean squared error, sigmoid, leaky ReLU, etc. when I get time
 ## File structure
+
 ./data has the MNIST dataset for training
+
 ./include has header files
+
 ./src has the main method (which includes the code for dataset handling) and the code for all the functions
+
 Overall the program is pretty easy to figure out, just look at the main method if you would like to run it yourself
 # Running the code
 Just type make and run ./main, it is currently set to train on MNIST numbers.
