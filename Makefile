@@ -1,5 +1,5 @@
 CC = clang
-CFLAGS = -O3 -Wall -g -I./include
+CFLAGS = -O3 -Wall -I./include
 LIBS = -lm
 
 SRC_DIR = src
@@ -8,7 +8,7 @@ OBJ_DIR = obj
 SRCS = $(wildcard $(SRC_DIR)/*.c)
 OBJS = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRCS))
 
-TARGET = neural_network
+TARGET = main
 
 all: $(TARGET)
 
