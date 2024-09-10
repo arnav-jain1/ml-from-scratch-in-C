@@ -1,1 +1,2 @@
+data filter=lfs diff=lfs merge=lfs -text
 data/train_dataset.txt filter=lfs diff=lfs merge=lfs -text
