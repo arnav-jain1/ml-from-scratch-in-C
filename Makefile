@@ -1,3 +1,4 @@
+# Change clang to gcc
 CC = clang
 CFLAGS = -O3 -Wall -I./include
 LIBS = -lm

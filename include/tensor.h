@@ -21,6 +21,8 @@ void print_tensor(Tensor* tensor);
 
 Tensor* create_tensor(const int* shape, int ndim, bool req_grad);
 Tensor* create_tensor_rand(const int* shape, int ndim, bool req_grad);
+// shhh between the one person that might see this and me, 
+// I still really don't get the point of header files but don't tell anyone
 void free_tensor(Tensor* tensor);
 
 

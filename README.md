@@ -1,12 +1,12 @@
 # Info
 This is program in written entirely in C and was done for fun to learn about the math and underlying code behind pytorch.
 
-Note: This code is highly unoptimized, it will be slower than C but that's okay! It is mainly because the program is single threaded and I will eventually try to increase the speed a bit. For now though, it has done its job.
+Note: This code is highly unoptimized, it will be slower than C but that's okay! It is mainly because the program is single threaded and I will eventually try to increase the speed a bit. For now though, it has done its job because the point of this code was to learn!
 
 I would also like to try to add some more functions like mean squared error, sigmoid, leaky ReLU, etc. when I get time
 ## File structure
 
-./data has the MNIST dataset for training
+./data has the MNIST dataset for training/testing
 
 ./include has header files
 

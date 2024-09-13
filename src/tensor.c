@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 
+// prints
 void print_tensor(Tensor* tensor) {
     printf("Tensor shape: (");
     for (int i = 0; i < tensor->ndim; i++) {
@@ -39,6 +40,7 @@ void print_tensor(Tensor* tensor) {
     printf("\n");
 }
 
+// makes a tensor with initialized to 0
 Tensor* create_tensor(const int* shape, int ndim, bool req_grad) {
 
     if (ndim < 0) {
@@ -83,6 +85,7 @@ Tensor* create_tensor(const int* shape, int ndim, bool req_grad) {
 
     return tensor;
 }
+// Tensor values randomized
 Tensor* create_tensor_rand(const int* shape, int ndim, bool req_grad) {
 
     if (ndim < 0) {

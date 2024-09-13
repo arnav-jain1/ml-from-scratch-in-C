@@ -11,4 +11,4 @@ Tensor* relu(Tensor* t1);
 void relu_d(Tensor* input, Tensor* grad_output);
 Tensor* softmax(Tensor* t1);
 
-#endif
+#endif //  !TENSOR_H

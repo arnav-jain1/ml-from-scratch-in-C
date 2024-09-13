@@ -6,6 +6,7 @@
 
 
 
+// Adds layer to the model, makes sure the model is big enough first
 void add_layer(Model* model, LAYER_TYPE type, int input, int output) {
     if (model->layer_index >= model->layer_size) { 
         fprintf(stderr, "Trying to put a layer at index more than layer size: index %d, size %d\n", model->layer_index, model->layer_size); 
@@ -31,6 +32,7 @@ void add_layer(Model* model, LAYER_TYPE type, int input, int output) {
     model->layer_index++;
 }
 
+// Creates a modle, pretty self explanitory
 Model* create_model(int num_layers) {
     Model* model = (Model *) malloc(sizeof(Model));
     if (model == NULL) {
@@ -56,11 +58,15 @@ Tensor* forward(Model* model, Tensor* input) {
         Layer* cur_layer = &model->layers[i];
         Tensor* next;
 
-        if (cur_layer->input) free_tensor(cur_layer->input);
+        // If the current layer already has an input, free it and create a new tensor with the values of the input
+        if (cur_layer->input) {
+            free_tensor(cur_layer->input);
+        }
         cur_layer->input = create_tensor(x->shape, x->ndim, true);
         for (int j = 0; j < x->shape[0] * x->shape[1]; j++) {
             cur_layer->input->data[j] = x->data[j];
         }       
+        // Depending on the layer type, do the operation and save it to next
         switch (cur_layer->layer_type) {
             case LINEAR_LAYER:
                 next = matmul(x, cur_layer->weights);
@@ -76,13 +82,16 @@ Tensor* forward(Model* model, Tensor* input) {
                 next = softmax(x);
                 break;
             default:
+                // Shouldn't reach here but just in case
                 fprintf(stderr,"INVALID INPUT FOR LAYER DURING FPASS %d", cur_layer->layer_type);
                 exit(EXIT_FAILURE);
                 break;
         }
 
 
+        // set the output of the current layer to next (output of this layer) and set the input of the next layer to "next"
         cur_layer->output = next;
+        // Also, free input to next layer if it isn't the input to the model and return the final output
         if (i > 0) {
             free_tensor(x);
         }
@@ -102,7 +111,7 @@ void backwards(Model* model, Tensor* pred, Tensor* act) {
     // Current gradient to mult with is the input (.grad)
     Tensor* cur_grad = pred;
     for (int i = last_layer; i >= 0; i--) {
-        // Current layer is the last layer
+        // Current layer is the last layer, it is also what will be used for the backprop
         Layer* cur_layer = &model->layers[i];
 
         switch (cur_layer->layer_type) {
@@ -127,6 +136,7 @@ void backwards(Model* model, Tensor* pred, Tensor* act) {
                 cur_grad = cur_layer->input;
                 break;
             case RELU_LAYER:
+                // Relu is pretty self explainitory 
                 relu_d(cur_layer->input, cur_grad);
                 cur_grad = cur_layer->input;
                 break;
@@ -140,6 +150,7 @@ void backwards(Model* model, Tensor* pred, Tensor* act) {
     }
 }
 
+// Free all the layers if they exist which is important cuz segfault
 void free_layer(Layer *layer) {
     if (layer->bias) {
         free_tensor(layer->bias);

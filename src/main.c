@@ -8,7 +8,9 @@
 #include <time.h>
 
 #define BATCH_SIZE 16
+#define EPOCHS 75
 
+// For dataset, need to refactor later when I have a better idea of how I want to do it
 typedef struct {
     int count;
     Tensor* inputs;
@@ -43,6 +45,7 @@ void free_dataset(Dataset* dataset) {
     free_tensor(dataset->actual);
     free(dataset);
 }
+// *SHould* work for all datasets structured correctly but haven't test
 void MNIST_dataset(const char* filename, Dataset* dataset) {
     FILE* file = fopen(filename, "r");
     if (file == NULL) {
@@ -51,16 +54,18 @@ void MNIST_dataset(const char* filename, Dataset* dataset) {
         exit(EXIT_FAILURE);
     }
 
-
+    // Temp buffer for line input
     char line[8192];
     int datapoint_index = 0;
     
+
+    // Reads line by line and split it up to before and after ;, save everything before as input and everything after as output, then increment the index
     while (fgets(line, sizeof(line), file) && datapoint_index < dataset->count) {
         char* input = strtok(line, ";");
         char* actual = strtok(NULL, "\n");
 
         char* token = strtok(input, ",");
-        for (int i = 0; i < 784 && token != NULL; i++) {
+        for (int i = 0; i < dataset->inputs->shape[1] && token != NULL; i++) {
             dataset->inputs->data[datapoint_index * 784 + i] = atof(token);
             token = strtok(NULL, ",");
         }
@@ -76,51 +81,6 @@ void MNIST_dataset(const char* filename, Dataset* dataset) {
 
     fclose(file);
 }
-/*int main() {*/
-    /*srand(time(NULL));*/
-
-    /*Dataset* dataset = create_dataset(86184, 784);*/
-    /*MNIST_dataset("data/train_dataset.txt", dataset);*/
-
-
-
-    /*int dims = 2;*/
-    /*int input_shape[] = {BATCH_SIZE,784};*/
-
-    /*Model* model = create_model(6);*/
-    /*add_layer(model, LINEAR_LAYER, 784, 500);*/
-    /*add_layer(model, RELU_LAYER, 500, 500);*/
-    /*add_layer(model, LINEAR_LAYER, 500, 100);*/
-    /*add_layer(model, RELU_LAYER, 100, 100);*/
-    /*add_layer(model, LINEAR_LAYER, 100, 10);*/
-    /*add_layer(model, SOFTMAX_LAYER, 10, 10);*/
-    /*int shape_act[] = {BATCH_SIZE, 1};*/
-
-
-    /*int epochs = 200;*/
-    /*for (int epoch = 0; epoch < epochs; epoch++) {*/
-        /*Tensor* input = create_tensor_rand(input_shape, dims, false);*/
-        /*Tensor* pred = forward(model, input);*/
-
-
-
-        /*double loss = cross_entropy_loss(pred, y_act);*/
-
-        /*printf("Loss: %.9f\n", loss);*/
-
-        /*backwards(model, pred, y_act);*/
-        /*SGD_step(model, .001);*/
-        /*zero_grad(model);*/
-
-        /*free_tensor(input);*/
-        /*free_tensor(pred);*/
-    /*}*/
-
-    /*free_model(model);*/
-
-    /*free_dataset(dataset);*/
-
-/*}*/
 
 int main() {
     srand(time(NULL));
@@ -138,10 +98,10 @@ int main() {
     add_layer(model, LINEAR_LAYER, 100, 10);
     add_layer(model, SOFTMAX_LAYER, 10, 10);
 
-    int epochs = 2;
     int num_batches = dataset->count / BATCH_SIZE;
+    double learning_rate = .01;
 
-    for (int epoch = 0; epoch < epochs; epoch++) {
+    for (int epoch = 0; epoch < EPOCHS; epoch++) {
         double total_loss = 0.0;
 
         for (int batch = 0; batch < num_batches; batch++) {
@@ -173,7 +133,7 @@ int main() {
             backwards(model, pred, y_act);
 
             // Update weights
-            SGD_step(model, 0.01);
+            SGD_step(model, learning_rate);
 
             // Zero gradients
             zero_grad(model);
@@ -187,10 +147,56 @@ int main() {
         // Print average loss for the epoch
         printf("Epoch %d, Average Loss: %.9f\n", epoch + 1, total_loss / num_batches);
     }
+    free_dataset(dataset);
+
+    Dataset* test_dataset = create_dataset(21546, 784);
+    MNIST_dataset("data/test_dataset.txt", dataset);
+    int correct_predictions = 0;
+    int total_predictions = test_dataset->count;
+
+
+
+    // Test the dataset
+    for (int i = 0; i < total_predictions; i++) {
+
+        int input_shape[] = {1, 784};
+        Tensor* input = create_tensor(input_shape, 2, false);
+        
+        // Same thing but for testing
+        for (int j = 0; j < 784; j++) {
+            input->data[j] = test_dataset->inputs->data[i * 784 + j];
+        }
+
+        // Forward pass
+        Tensor* pred = forward(model, input);
+
+        // Find the index of the maximum value in the prediction
+        int predicted_class = 0;
+        double max_prob = pred->data[0];
+        for (int j = 1; j < 10; j++) {
+            if (pred->data[j] > max_prob) {
+                max_prob = pred->data[j];
+                predicted_class = j;
+            }
+        }
+
+        int actual_class = (int)test_dataset->actual->data[i];
+        if (predicted_class == actual_class) {
+            correct_predictions++;
+        }
+
+        free_tensor(input);
+        free_tensor(pred);
+    }
+
+    double accuracy = (double)correct_predictions / total_predictions * 100.0;
+    printf("Model Accuracy: %.2f%%\n", accuracy);
+
+
 
     // Free model and dataset
+    free_dataset(test_dataset);
     free_model(model);
-    free_dataset(dataset);
 
     return 0;
 }

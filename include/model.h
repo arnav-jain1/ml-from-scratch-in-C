@@ -3,6 +3,7 @@
 
 #include "tensor.h"
 
+// enum starting at 1 so that uninitialized is 0
 typedef enum {
     LINEAR_LAYER = 1,
     RELU_LAYER,
