@@ -1,7 +1,7 @@
 # Info
 This is program in written entirely in C and was done for fun to learn about the math and underlying code behind pytorch.
 
-Note: This code is highly unoptimized, it will be slower than C but that's okay! It is mainly because the program is single threaded and I will eventually try to increase the speed a bit. For now though, it has done its job because the point of this code was to learn! Even then though, it was able to achieve a 99% score on the MNIST dataset :)
+Note: This code is highly unoptimized, it will be slower than PyTorch (or even NumPy) but that's okay! It is mainly because the program is single threaded and I will eventually try to increase the speed a bit. For now though, it has done its job because the point of this code was to learn! Even with its slowness, it was able to achieve a 99% score on the MNIST dataset in about an hour and a half :)
 
 I would also like to try to add some more functions like mean squared error, sigmoid, leaky ReLU, etc. when I get time
 ## File structure
